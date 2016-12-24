@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">CourseMark</string>
+    <string name="add_course">Add Course</string>
+    <string name="course_list">CourseList</string>
+    <string name="add_mark">Add Mark</string>
+    <string name="remove_marks">Remove</string>
+    <string name="calculate_mark">Calculate</string>
+    <string name="target_mark">Target Mark:</string>
+    <string name="enter_here">target</string>
+</resources>
