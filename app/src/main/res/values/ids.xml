@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <item name="marks_view" type="id">marks</item>
+    <item name="marks_scroll_view" type="id">marksScrollView</item>
 </resources>
