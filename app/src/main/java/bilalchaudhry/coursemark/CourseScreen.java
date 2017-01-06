@@ -9,6 +9,7 @@ import android.support.v4.widget.TextViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.InputType;
+import android.text.Layout;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,6 +42,8 @@ public class CourseScreen extends AppCompatActivity {
         final ScrollView marksScrollView = (ScrollView) findViewById(R.id.marks_scroll_view);
         final LinearLayout marksView = (LinearLayout) findViewById(R.id.marks_view);
         inflateMarksList(context, course, marksView);
+
+        final EditText targetMark = (EditText) findViewById(R.id.target_mark);
 
         Button addMarkButton = (Button) findViewById(R.id.add_mark_button);
         addMarkButton.setOnClickListener(new View.OnClickListener() {
@@ -102,6 +105,42 @@ public class CourseScreen extends AppCompatActivity {
                 builder.show();
             }
         });
+
+        Button removeMarksButton = (Button) findViewById(R.id.remove_button);
+        removeMarksButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(final View v) {
+                for (int i = 0; i < marksView.getChildCount(); i++) {
+                    LinearLayout row = (LinearLayout)marksView.getChildAt(i);
+                    CheckBox markCheckBox = (CheckBox)row.getChildAt(0);
+                    if (markCheckBox.isChecked()) {
+                        marksView.removeView(row);
+                        course.getMarks().remove(i);
+                        courses.save(context, stringId);
+                        i -= 1;
+                    }
+                }
+            }
+        });
+
+        Button calculateMarkButton = (Button) findViewById(R.id.calculate_button);
+        calculateMarkButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(final View v) {
+                double currentMark = 0.0;
+                double currentTotalWeight = 0.0;
+                for (Mark mark : course.getMarks()) {
+                    currentMark += (double)mark.getNumerator() / (double)mark.getDenominator() * (double)mark.getWeight();
+                    currentTotalWeight += (double)mark.getWeight();
+                }
+                currentMark /= (currentTotalWeight / 100.0);
+
+                if (!targetMark.getText().toString().isEmpty()) {
+                    double neededMark = 0.0;
+                    neededMark = Double.valueOf(targetMark.getText().toString()) - (currentMark * currentTotalWeight / 100.0);
+                    neededMark = Math.round((100 * neededMark) / (100.0 - currentTotalWeight) * 100.0) / 100.0;
+                }
+                currentMark = Math.round(currentMark * 100.0) / 100.0;
+            }
+        });
     }
 
     public void inflateMarksList(Context context, Course course, LinearLayout marksView) {
@@ -128,29 +167,13 @@ public class CourseScreen extends AppCompatActivity {
         nameView.setText(mark.getName());
         markRow.addView(nameView);
 
-        LinearLayout.LayoutParams markNumParams = new LinearLayout.LayoutParams(
-                0, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f);
+        LinearLayout.LayoutParams marksParam = new LinearLayout.LayoutParams(
+                0, LinearLayout.LayoutParams.MATCH_PARENT, 1.5f);
         TextView markNum = new TextView(context);
-        markNum.setLayoutParams(markNumParams);
+        markNum.setLayoutParams(marksParam);
         markNum.setGravity(Gravity.CENTER);
-        markNum.setText((String.valueOf(mark.getNumerator())));
+        markNum.setText((String.valueOf(mark.getNumerator()) + " / " + String.valueOf(mark.getDenominator())));
         markRow.addView(markNum);
-
-        LinearLayout.LayoutParams slashParams = new LinearLayout.LayoutParams(
-                0, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f);
-        TextView slash = new TextView(context);
-        slash.setLayoutParams(slashParams);
-        slash.setGravity(Gravity.CENTER);
-        slash.setText(" / ");
-        markRow.addView(slash);
-
-        LinearLayout.LayoutParams markDenomParams = new LinearLayout.LayoutParams(
-                0, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f);
-        TextView markDenom = new TextView(context);
-        markDenom.setLayoutParams(markDenomParams);
-        markDenom.setGravity(Gravity.CENTER);
-        markDenom.setText(String.valueOf(mark.getDenominator()));
-        markRow.addView(markDenom);
 
         LinearLayout.LayoutParams weightParams = new LinearLayout.LayoutParams(
                 0, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f);
