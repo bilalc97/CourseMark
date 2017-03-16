@@ -20,6 +20,7 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TableLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class CourseScreen extends AppCompatActivity {
 
@@ -133,12 +134,20 @@ public class CourseScreen extends AppCompatActivity {
                 }
                 currentMark /= (currentTotalWeight / 100.0);
 
+                currentMark = Math.round(currentMark * 100.0) / 100.0;
+                Context context = getApplicationContext();
+                CharSequence text = "Current mark in " + Double.toString(currentTotalWeight) + "% of course is: " + Double.toString(currentMark);
+
                 if (!targetMark.getText().toString().isEmpty()) {
                     double neededMark = 0.0;
                     neededMark = Double.valueOf(targetMark.getText().toString()) - (currentMark * currentTotalWeight / 100.0);
                     neededMark = Math.round((100 * neededMark) / (100.0 - currentTotalWeight) * 100.0) / 100.0;
+                    text = text.toString() + "\nNeeded mark in remaining " + Double.toString(100.0 - currentTotalWeight) + "% of course is: " + Double.toString(neededMark);
                 }
-                currentMark = Math.round(currentMark * 100.0) / 100.0;
+
+                int duration = Toast.LENGTH_LONG;
+                Toast toast = Toast.makeText(context, text, duration);
+                toast.show();
             }
         });
     }
